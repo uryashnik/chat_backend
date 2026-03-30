@@ -1,20 +1,58 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  Res,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { Public } from './decorators/public.decoretor';
+import { UserEntity } from '../common/entities/user.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('register')
+  @Public()
   register(@Body() createAuthDto: CreateUserDto) {
     return this.authService.register(createAuthDto);
   }
 
   @Post('login')
+  @Public()
   @UseGuards(LocalAuthGuard)
-  login(@Body('email') email: string) {
-    return this.authService.login(email);
+  @HttpCode(HttpStatus.OK)
+  login(
+    @Req() req: Request & { user: UserEntity },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = this.authService.login(req.user.email);
+
+    res.cookie(this.configService.getOrThrow<string>('COOKIE_NAME'), token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: +this.configService.getOrThrow<string>('COOKIE_MAX_AGE_MS'),
+    });
+
+    return { message: 'Login successful' };
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie(this.configService.getOrThrow<string>('COOKIE_NAME'));
+    return { message: 'Logout successful' };
   }
 }
