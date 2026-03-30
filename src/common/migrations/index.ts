@@ -1,3 +1,9 @@
 import { CreateUsers1774868830492 } from './1774868830492-create-users';
+import { UpdateUsers1774897395654 } from './1774897395654-update-users';
+import { CreateMessages1774898667881 } from './1774898667881-create-messages';
 
-export const migrations = [CreateUsers1774868830492];
+export const migrations = [
+  CreateUsers1774868830492,
+  UpdateUsers1774897395654,
+  CreateMessages1774898667881,
+];
