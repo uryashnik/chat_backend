@@ -7,6 +7,7 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { Repository } from 'typeorm';
 import { MessageEntity } from '../common/entities/message.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Injectable()
 export class MessagesService {
@@ -39,7 +40,7 @@ export class MessagesService {
 
   public async update(
     id: number,
-    updateMessageDto: CreateMessageDto,
+    updateMessageDto: UpdateMessageDto,
     userId: number,
   ) {
     const message = await this.findOne(id);

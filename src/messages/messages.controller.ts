@@ -11,6 +11,7 @@ import {
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { AuthRequest } from '../common/types';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Controller('messages')
 export class MessagesController {
@@ -29,7 +30,7 @@ export class MessagesController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateMessageDto: CreateMessageDto,
+    @Body() updateMessageDto: UpdateMessageDto,
     @Req() req: AuthRequest,
   ) {
     return this.messagesService.update(+id, updateMessageDto, req.user.id);
