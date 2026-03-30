@@ -15,8 +15,8 @@ export class UserEntity {
 
   @Column({ type: 'enum', enum: Gender })
   gender: Gender;
-
-  @Column({ type: 'varchar', length: 40 })
+  // todo: add uniqe
+  @Column({ type: 'varchar', length: 40, unique: true })
   email: string;
 
   @Column({ type: 'varchar', select: false })

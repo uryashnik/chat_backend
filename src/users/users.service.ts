@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,14 +10,20 @@ import { ConfigService } from '@nestjs/config';
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly usersService: Repository<UserEntity>,
+    private readonly usersRepository: Repository<UserEntity>,
     private readonly configService: ConfigService,
   ) {}
 
-  public async getUserByEmail(email: string) {
-    return this.usersService.findOneBy({
-      email,
-    });
+  private getUserByEmail(email: string) {
+    return this.usersRepository.findOneBy({ email });
+  }
+
+  public async getFullUserByEmail(email: string) {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email })
+      .addSelect('user.password')
+      .getOne();
   }
 
   public async create(createUserDto: CreateUserDto) {
@@ -26,7 +32,7 @@ export class UsersService {
       parseInt(this.configService.getOrThrow('PASSWORD_SALT_ROUNDS'), 10),
     );
 
-    return await this.usersService.save({
+    return await this.usersRepository.save({
       ...createUserDto,
       password: hashedPassword,
     });
@@ -36,8 +42,8 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  public findOne(email: string) {
+    return this.getUserByEmail(email);
   }
 
   update(id: number, updateUserDto: any) {
