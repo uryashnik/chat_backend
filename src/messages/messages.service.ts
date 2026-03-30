@@ -18,7 +18,8 @@ export class MessagesService {
   private getQb() {
     return this.messagesRepository
       .createQueryBuilder('messages')
-      .leftJoinAndSelect('messages.author', 'author');
+      .leftJoinAndSelect('messages.author', 'author')
+      .leftJoinAndSelect('messages.tag', 'tag');
   }
 
   private findOne(id: number) {

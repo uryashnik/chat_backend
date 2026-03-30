@@ -8,13 +8,13 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './decorators/public.decoretor';
-import { UserEntity } from '../common/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
+import { AuthRequest } from '../common/types';
 
 @Controller('auth')
 export class AuthController {
@@ -33,10 +33,7 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
-  login(
-    @Req() req: Request & { user: UserEntity },
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  login(@Req() req: AuthRequest, @Res({ passthrough: true }) res: Response) {
     const token = this.authService.login(req.user.email);
 
     res.cookie(this.configService.getOrThrow<string>('COOKIE_NAME'), token, {

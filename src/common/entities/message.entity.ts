@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { MessageTagEntity } from './message-tag.entity';
 
 @Entity('messages')
 export class MessageEntity {
@@ -19,6 +20,9 @@ export class MessageEntity {
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE', nullable: false })
   author: UserEntity;
+
+  @ManyToOne(() => MessageTagEntity, { onDelete: 'SET NULL', nullable: true })
+  tag: MessageTagEntity;
 
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt?: Date;
