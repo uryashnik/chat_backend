@@ -1,0 +1,30 @@
+# Common infrastructure services
+# Run this first to start the infrastructure services
+version: '3.8'
+
+name: chat-infrastructure
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: chat_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASS}
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    networks:
+      - logistic_network
+
+networks:
+  logistic_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
