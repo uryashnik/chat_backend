@@ -19,7 +19,7 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 40 })
   email: string;
 
-  @Column({ type: 'varchar', select: false,  })
+  @Column({ type: 'varchar', select: false })
   password: string;
 
   @Column({ type: 'varchar', name: 'first_name', length: 40 })
