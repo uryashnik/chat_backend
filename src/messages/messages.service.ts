@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { MessageEntity } from '../common/entities/message.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { FindMessagesQueryDto } from './dto/find-messages-query.dto';
 
 @Injectable()
 export class MessagesService {
@@ -34,8 +35,38 @@ export class MessagesService {
     });
   }
 
-  findAll() {
-    return this.getQb().getMany();
+  async findAll(query: FindMessagesQueryDto) {
+    const { page, limit, dateFrom, dateTo, authorId, tagId } = query;
+    const qb = this.getQb();
+
+    if (dateFrom) {
+      qb.andWhere('messages.createdAt >= :dateFrom', { dateFrom });
+    }
+    if (dateTo) {
+      qb.andWhere('messages.createdAt <= :dateTo', { dateTo });
+    }
+    if (authorId) {
+      qb.andWhere('messages.author = :authorId', { authorId });
+    }
+    if (tagId) {
+      qb.andWhere('messages.tag = :tagId', { tagId });
+    }
+
+    qb.orderBy('messages.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   public async update(

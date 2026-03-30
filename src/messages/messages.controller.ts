@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   Req,
+  Query,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { AuthRequest } from '../common/types';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { FindMessagesQueryDto } from './dto/find-messages-query.dto';
 
 @Controller('messages')
 export class MessagesController {
@@ -23,8 +25,8 @@ export class MessagesController {
   }
 
   @Get()
-  findAll() {
-    return this.messagesService.findAll();
+  findAll(@Query() query: FindMessagesQueryDto) {
+    return this.messagesService.findAll(query);
   }
 
   @Patch(':id')
