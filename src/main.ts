@@ -4,8 +4,6 @@ import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 
-const FALLBACK_PORT = 3000;
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
@@ -25,8 +23,6 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(
-    (configService.get<number>('PORT') as number) || FALLBACK_PORT,
-  );
+  await app.listen(configService.get<number>('PORT') as number);
 }
 bootstrap();

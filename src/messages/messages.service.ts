@@ -41,7 +41,7 @@ export class MessagesService {
   async findAll(query: FindMessagesQueryDto) {
     const { page, limit, dateFrom, dateTo, authorId, tagId } = query;
     const qb = this.getQb();
-    console.log('query: ', query);
+
     if (dateFrom) {
       qb.andWhere('messages.createdAt >= :dateFrom', { dateFrom });
     }
