@@ -39,18 +39,10 @@ export class UsersService {
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.usersRepository.find();
   }
 
   public findOne(email: string) {
     return this.getUserByEmail(email);
-  }
-
-  update(id: number, updateUserDto: any) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 }

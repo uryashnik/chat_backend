@@ -3,9 +3,10 @@ import { MessagesService } from './messages.service';
 import { MessagesController } from './messages.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MessageEntity } from '../common/entities/message.entity';
+import { MessageTagEntity } from '../common/entities/message-tag.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MessageEntity])],
+  imports: [TypeOrmModule.forFeature([MessageEntity, MessageTagEntity])],
   controllers: [MessagesController],
   providers: [MessagesService],
 })

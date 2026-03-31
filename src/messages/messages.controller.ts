@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -24,18 +25,28 @@ export class MessagesController {
     return this.messagesService.create(createMessageDto, req.user.id);
   }
 
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.messagesService.findOne(id);
+  }
+
   @Get()
   findAll(@Query() query: FindMessagesQueryDto) {
     return this.messagesService.findAll(query);
   }
 
+  @Get('/tags')
+  tags() {
+    return this.messagesService.getTags();
+  }
+
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateMessageDto: UpdateMessageDto,
     @Req() req: AuthRequest,
   ) {
-    return this.messagesService.update(+id, updateMessageDto, req.user.id);
+    return this.messagesService.update(id, updateMessageDto, req.user.id);
   }
 
   @Delete(':id')

@@ -9,12 +9,15 @@ import { MessageEntity } from '../common/entities/message.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { FindMessagesQueryDto } from './dto/find-messages-query.dto';
+import { MessageTagEntity } from '../common/entities/message-tag.entity';
 
 @Injectable()
 export class MessagesService {
   constructor(
     @InjectRepository(MessageEntity)
     readonly messagesRepository: Repository<MessageEntity>,
+    @InjectRepository(MessageTagEntity)
+    readonly messageTagsRepository: Repository<MessageTagEntity>,
   ) {}
 
   private getQb() {
@@ -24,7 +27,7 @@ export class MessagesService {
       .leftJoinAndSelect('messages.tag', 'tag');
   }
 
-  private findOne(id: number) {
+  private findById(id: number) {
     return this.getQb().where({ id }).getOne();
   }
 
@@ -74,7 +77,7 @@ export class MessagesService {
     updateMessageDto: UpdateMessageDto,
     userId: number,
   ) {
-    const message = await this.findOne(id);
+    const message = await this.findById(id);
 
     if (!message) {
       throw new NotFoundException(`Message with id ${id} not found`);
@@ -89,7 +92,7 @@ export class MessagesService {
   }
 
   public async remove(id: number, userId) {
-    const message = await this.findOne(id);
+    const message = await this.findById(id);
 
     if (!message) {
       throw new NotFoundException(`Message with id ${id} not found`);
@@ -99,5 +102,13 @@ export class MessagesService {
     }
 
     return this.messagesRepository.softRemove({ id });
+  }
+
+  public findOne(id: number) {
+    return this.findById(id);
+  }
+
+  public getTags() {
+    return this.messageTagsRepository.find();
   }
 }
