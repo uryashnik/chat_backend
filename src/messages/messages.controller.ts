@@ -25,6 +25,11 @@ export class MessagesController {
     return this.messagesService.create(createMessageDto, req.user.id);
   }
 
+  @Get('/tags')
+  tags() {
+    return this.messagesService.getTags();
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.messagesService.findOne(id);
@@ -33,11 +38,6 @@ export class MessagesController {
   @Get()
   findAll(@Query() query: FindMessagesQueryDto) {
     return this.messagesService.findAll(query);
-  }
-
-  @Get('/tags')
-  tags() {
-    return this.messagesService.getTags();
   }
 
   @Patch(':id')
