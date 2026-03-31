@@ -7,14 +7,16 @@ import {
   Res,
   HttpCode,
   HttpStatus,
+  Get,
 } from '@nestjs/common';
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './decorators/public.decoretor';
-import { UserEntity } from '../common/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
+import { AuthRequest } from '../common/types';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -25,6 +27,7 @@ export class AuthController {
 
   @Post('register')
   @Public()
+  @HttpCode(HttpStatus.CREATED)
   register(@Body() createAuthDto: CreateUserDto) {
     return this.authService.register(createAuthDto);
   }
@@ -33,10 +36,7 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
-  login(
-    @Req() req: Request & { user: UserEntity },
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  login(@Req() req: AuthRequest, @Res({ passthrough: true }) res: Response) {
     const token = this.authService.login(req.user.email);
 
     res.cookie(this.configService.getOrThrow<string>('COOKIE_NAME'), token, {
@@ -45,8 +45,16 @@ export class AuthController {
       sameSite: 'lax',
       maxAge: +this.configService.getOrThrow<string>('COOKIE_MAX_AGE_MS'),
     });
+    const { password, ...user } = req.user;
+    return { ...user };
+  }
 
-    return { message: 'Login successful' };
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  profile(@Req() req) {
+    const { password, ...user } = req.user;
+    return { ...user };
   }
 
   @Post('logout')
